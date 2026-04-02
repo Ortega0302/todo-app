@@ -1,19 +1,21 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-function AddTodoForm({ onTodoAdded }) {
+function AddTodoForm({ onTodoAdded, token }) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [error, setError] = useState('');
 
     const handleSubmit = (e) => {
-        e.preventDefault()
-        if (title.trim() === ""){
-            setError("Please type in a todo!")
-            return; // Exit early to prevent submission
+        e.preventDefault();
+        if (title.trim() === "") {
+            setError("Please type in a todo!");
+            return;
         }
         setError('');
-        axios.post('http://localhost:8080/api/todos', { title, description })
+        axios.post('http://localhost:8080/api/todos', { title, description }, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then(() => {
                 onTodoAdded();
                 setTitle('');
