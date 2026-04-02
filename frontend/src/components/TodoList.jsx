@@ -4,6 +4,8 @@ function TodoList({ todos, onToggle, onDelete, editingTodo, onEdit, onSave, onCa
     const [editTitle, setEditTitle] = useState('');
     const [editDescription, setEditDescription] = useState('');
 
+    const [expandedId, setExpandedId] = useState(null);
+
     const handleEdit = (todo) => {
         setEditTitle(todo.title);
         setEditDescription(todo.description);
@@ -60,6 +62,7 @@ function TodoList({ todos, onToggle, onDelete, editingTodo, onEdit, onSave, onCa
                                 </div>
                             </div>
                         ) : (
+
                             <div className="grid grid-cols-12 gap-2 items-center">
                                 <div className="col-span-1">
                                     <input
@@ -72,7 +75,10 @@ function TodoList({ todos, onToggle, onDelete, editingTodo, onEdit, onSave, onCa
                                 <div className={`col-span-3 ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                                     {todo.title}
                                 </div>
-                                <div className={`col-span-4 text-gray-400 ${todo.completed ? 'line-through text-gray-500' : ''}`}>
+                                <div
+                                    className={`col-span-4 text-gray-400 cursor-pointer ${expandedId === todo.id ? 'break-words' : 'truncate'} ${todo.completed ? 'line-through text-gray-500' : ''}`}
+                                    onClick={() => setExpandedId(expandedId === todo.id ? null : todo.id)}
+                                >
                                     {todo.description}
                                 </div>
                                 <div className="col-span-1">
@@ -93,6 +99,11 @@ function TodoList({ todos, onToggle, onDelete, editingTodo, onEdit, onSave, onCa
                                     >
                                         Delete
                                     </button>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-blue-500">
+                                        {new Date(todo.createdAt).toLocaleDateString()}
+                                    </p>
                                 </div>
                             </div>
                         )}

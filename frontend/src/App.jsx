@@ -48,6 +48,28 @@ function App() {
         setEditingTodo(null);
     };
 
+    const [sortOrder, setSortOrder] = useState('newest');
+
+    const sortedTodos = [...todos].sort((a, b) => {
+        if (sortOrder === 'newest') {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        }else{
+            return new Date(a.createdAt) - new Date(b.createdAt);
+        }
+    });
+
+    const clearCompleted = async () => {
+        const completedTodos = todos.filter(todo => todo.completed);
+        try {
+            await  Promise.all(
+                completedTodos.map(todo => axios.delete(`http://localhost:8080/api/todos/${todo.id}`))
+            );
+            fetchTodos();
+        } catch (error){
+            console.error('Error clearing completed:', error);
+        }
+    };
+
     useEffect(() => {
         fetchTodos();
     }, []);
@@ -57,8 +79,23 @@ function App() {
             <div className="max-w-2xl mx-auto">
                 <h1 className="text-4xl font-bold text-center mb-8">Todo App</h1>
                 <AddTodoForm onTodoAdded={fetchTodos} />
+                <div className="flex gap-4 mb-4">
+                    <button
+                        onClick={() => setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')}
+                        className="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded px-4 py-2 transition"
+                    >
+                        Sort: {sortOrder === 'newest' ? 'Newest First' : 'Oldest First'}
+                    </button>
+                    <button
+                        onClick={clearCompleted}
+                        className="bg-red-700 hover:bg-red-600 text-gray-300 text-sm rounded px-4 py-2 transition"
+                    >
+                        Clear Completed
+                    </button>
+                </div>
+
                 <TodoList
-                    todos={todos}
+                    todos={sortedTodos}
                     onToggle={toggleTodo}
                     onDelete={deleteTodo}
                     editingTodo={editingTodo}
@@ -67,6 +104,7 @@ function App() {
                     onCancel={cancelEdit}
                 />
             </div>
+
         </div>
     );
 }

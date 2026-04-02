@@ -4,9 +4,15 @@ import axios from 'axios';
 function AddTodoForm({ onTodoAdded }) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [error, setError] = useState('');
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+        e.preventDefault()
+        if (title.trim() === ""){
+            setError("Please type in a todo!")
+            return; // Exit early to prevent submission
+        }
+        setError('');
         axios.post('http://localhost:8080/api/todos', { title, description })
             .then(() => {
                 onTodoAdded();
@@ -21,6 +27,7 @@ function AddTodoForm({ onTodoAdded }) {
     return (
         <div className="bg-gray-800 rounded-lg p-6 mb-8">
             <h2 className="text-xl font-semibold mb-4">Add New Todo</h2>
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             <form onSubmit={handleSubmit} className="flex gap-4 items-end">
                 <div className="flex-1">
                     <label className="block text-sm text-gray-400 mb-1">Todo</label>
