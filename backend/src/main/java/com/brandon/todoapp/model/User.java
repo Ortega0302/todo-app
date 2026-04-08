@@ -21,6 +21,11 @@ public class User {
     @NotBlank
     private String password;
 
+    private String displayName;
+
+    @Column(columnDefinition = "TEXT")
+    private String profileImage;
+
     public User(){}
 
     public void setId(Long id) {
@@ -39,6 +44,10 @@ public class User {
         this.password = password;
     }
 
+    public void setDisplayName(String displayName) {this.displayName = displayName;}
+
+    public void setProfileImage(String profileImage) {this.profileImage = profileImage;}
+
     public Long getId() {
         return id;
     }
@@ -54,4 +63,8 @@ public class User {
     public String getPassword() {
         return password;
     }
+
+    public String getDisplayName() {return displayName;}
+
+    public String getProfileImage() {return profileImage;}
 }

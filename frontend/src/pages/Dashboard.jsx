@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TodoList from '../components/TodoList';
 import AddTodoForm from '../components/AddTodoForm';
+import ProfileDropdown from '../components/ProfileDropdown';
 
 function Dashboard() {
     const [todos, setTodos] = useState([]);
     const [editingTodo, setEditingTodo] = useState(null);
     const [sortOrder, setSortOrder] = useState('newest');
+    const [profile, setProfile] = useState({ displayName: '', email: '', profileImage: '' });
     const navigate = useNavigate();
 
     const token = localStorage.getItem('token');
@@ -16,19 +18,22 @@ function Dashboard() {
         headers: { Authorization: `Bearer ${token}` }
     };
 
+    const fetchTodos = () => {
+        axios.get('http://localhost:8080/api/todos', authHeader)
+            .then(response => setTodos(response.data))
+            .catch(error => console.error('Error fetching todos:', error));
+    };
+
     useEffect(() => {
         if (!token) {
             navigate('/login');
             return;
         }
         fetchTodos();
+        axios.get('http://localhost:8080/api/user/profile', authHeader)
+            .then(response => setProfile(response.data))
+            .catch(error => console.error('Error fetching profile:', error));
     }, []);
-
-    const fetchTodos = () => {
-        axios.get('http://localhost:8080/api/todos', authHeader)
-            .then(response => setTodos(response.data))
-            .catch(error => console.error('Error fetching todos:', error));
-    };
 
     const toggleTodo = (todo) => {
         axios.put(`http://localhost:8080/api/todos/${todo.id}`, {
@@ -85,22 +90,12 @@ function Dashboard() {
         }
     });
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/');
-    };
-
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
             <div className="max-w-2xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold">Todo App</h1>
-                    <button
-                        onClick={handleLogout}
-                        className="bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded px-4 py-2 transition"
-                    >
-                        Logout
-                    </button>
+                    <ProfileDropdown profile={profile} />
                 </div>
                 <AddTodoForm onTodoAdded={fetchTodos} token={token} />
                 <div className="flex gap-4 mb-4">
